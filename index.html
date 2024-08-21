@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INUNI - Something Big is Coming Soon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .content {
+            text-align: center;
+            z-index: 3;
+            position: relative;
+        }
+        h1 {
+            font-size: 6vw;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+        .tagline {
+            font-size: 1.8vw;
+            margin: 10px 0;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            opacity: 0.9;
+        }
+        .contact {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9em;
+            z-index: 3;
+        }
+        a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+        a:hover {
+            opacity: 0.8;
+        }
+        .copyright {
+            margin-top: 10px;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: #fff;
+            opacity: 0.5;
+        }
+        #event-horizon {
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.3);
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div id="event-horizon"></div>
+    <div class="content">
+        <h1>INUNI</h1>
+        <div class="tagline">coming soon...</div>
+    </div>
+    <div class="contact">
+        <a href="mailto:arya@getuni.app">Contact Us</a>
+        <div class="copyright">&copy; 2024 Amorphic Labs. All rights reserved.</div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const particlesContainer = document.getElementById('particles-js');
+            const eventHorizon = document.getElementById('event-horizon');
+            let particleCount = 100;
+            const particles = [];
+            let horizonRadius = Math.min(window.innerWidth, window.innerHeight) * 0.1;
+            let startTime = Date.now();
+
+            function setEventHorizonSize() {
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                eventHorizon.style.width = horizonRadius * 2 + 'px';
+                eventHorizon.style.height = horizonRadius * 2 + 'px';
+                eventHorizon.style.left = centerX - horizonRadius + 'px';
+                eventHorizon.style.top = centerY - horizonRadius + 'px';
+            }
+
+            function createParticle() {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.width = Math.random() * 3 + 1 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particlesContainer.appendChild(particle);
+                return particle;
+            }
+
+            function animateParticle(particle) {
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                const x = particle.offsetLeft - centerX;
+                const y = particle.offsetTop - centerY;
+                const distance = Math.sqrt(x*x + y*y);
+                const angle = Math.atan2(y, x);
+                
+                let animationDuration = (distance / window.innerWidth) * 10000;
+                let scale = 1;
+                let opacity = 0.5;
+
+                if (distance <= horizonRadius + 10) {
+                    const stickPoint = horizonRadius + Math.random() * 10;
+                    const stickX = Math.cos(angle) * stickPoint;
+                    const stickY = Math.sin(angle) * stickPoint;
+                    animationDuration = 100000;
+                    scale = 0.5 + (horizonRadius - distance) / horizonRadius;
+                    opacity = 1;
+
+                    const keyframes = [
+                        { transform: 'translate(0, 0) scale(1)', opacity: 0.5 },
+                        { transform: `translate(${stickX - x}px, ${stickY - y}px) scale(${scale})`, opacity: opacity }
+                    ];
+                    
+                    const animation = particle.animate(keyframes, {
+                        duration: animationDuration,
+                        iterations: 1,
+                        fill: 'forwards',
+                        easing: 'ease-out'
+                    });
+
+                    return animation;
+                }
+
+                const keyframes = [
+                    { transform: 'translate(0, 0) scale(1)', opacity: 0.5 },
+                    { transform: `translate(${-x}px, ${-y}px) scale(${scale})`, opacity: opacity }
+                ];
+                
+                const animation = particle.animate(keyframes, {
+                    duration: animationDuration,
+                    iterations: 1,
+                    fill: 'forwards',
+                    easing: 'ease-in-out'
+                });
+
+                return animation;
+            }
+
+            function updateParticles() {
+                const elapsedTime = (Date.now() - startTime) / 1000;
+                const targetParticleCount = Math.min(500, Math.floor(100 + elapsedTime * 10));
+
+                while (particles.length < targetParticleCount) {
+                    const particle = createParticle();
+                    particles.push(particle);
+                    animateParticle(particle);
+                }
+
+                // Increase the thickness of the event horizon over time
+                const thickness = Math.min(20, 5 + elapsedTime * 0.5);
+                eventHorizon.style.boxShadow = `0 0 ${thickness}px ${thickness / 2}px rgba(255, 255, 255, 0.3)`;
+
+                requestAnimationFrame(updateParticles);
+            }
+
+            setEventHorizonSize();
+            updateParticles();
+
+            window.addEventListener('resize', setEventHorizonSize);
+        });
+    </script>
+</body>
+</html>
